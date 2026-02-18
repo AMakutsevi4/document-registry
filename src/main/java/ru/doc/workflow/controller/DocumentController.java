@@ -1,0 +1,61 @@
+package ru.doc.workflow.controller;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import ru.doc.workflow.dto.document.DocumentRequest;
+import ru.doc.workflow.dto.document.DocumentResponse;
+import ru.doc.workflow.dto.history.DocumentWithHistoryResponse;
+import ru.doc.workflow.dto.submit.BatchResultItem;
+import ru.doc.workflow.dto.submit.BatchSubmitRequest;
+import ru.doc.workflow.service.DocumentService;
+
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/documents")
+@RequiredArgsConstructor
+public class DocumentController {
+
+    private final DocumentService documentService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public DocumentResponse save(@RequestBody @Valid DocumentRequest rateRequest) {
+        return documentService.create(rateRequest);
+    }
+
+    @GetMapping("/{id}")
+    public DocumentWithHistoryResponse getOne(@PathVariable Long id) {
+        return documentService.getById(id);
+    }
+
+    @GetMapping
+    public Page<DocumentResponse> getBatch(
+            @RequestParam List<Long> ids,
+            Pageable pageable) {
+        return documentService.getByIds(ids, pageable);
+    }
+
+    @PostMapping("/submit")
+    public List<BatchResultItem> submitBatch(
+            @RequestBody @Valid BatchSubmitRequest request) {
+
+        return documentService.submitBatch(
+                request.ids(),
+                request.initiator(),
+                request.comment()
+        );
+    }
+}
