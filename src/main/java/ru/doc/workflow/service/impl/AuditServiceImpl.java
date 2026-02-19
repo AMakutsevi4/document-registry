@@ -9,17 +9,15 @@ import ru.doc.workflow.entity.Document;
 import ru.doc.workflow.entity.DocumentHistory;
 import ru.doc.workflow.enums.ActionType;
 import ru.doc.workflow.reposiory.DocumentHistoryRepository;
-import ru.doc.workflow.service.AuditService;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuditServiceImpl implements AuditService {
+public class AuditServiceImpl {
 
     private final DocumentHistoryRepository historyRepository;
 
     @Transactional(propagation = Propagation.MANDATORY)
-    @Override
     public void logAction(Document document, String initiator, ActionType action, String comment) {
         log.debug("Logging history: documentId={}, action={}, initiator={}",
                 document.getId(), action, initiator);

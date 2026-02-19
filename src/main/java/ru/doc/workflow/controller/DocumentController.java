@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.doc.workflow.dto.document.DocumentRequest;
-import ru.doc.workflow.dto.document.DocumentResponse;
-import ru.doc.workflow.dto.history.DocumentWithHistoryResponse;
-import ru.doc.workflow.dto.submit.BatchResultItem;
-import ru.doc.workflow.dto.submit.BatchSubmitRequest;
-import ru.doc.workflow.service.DocumentService;
+import ru.doc.workflow.controller.dto.document.DocumentRequest;
+import ru.doc.workflow.controller.dto.document.DocumentResponse;
+import ru.doc.workflow.controller.dto.history.DocumentWithHistoryResponse;
+import ru.doc.workflow.controller.dto.submit.BatchResultItem;
+import ru.doc.workflow.controller.dto.submit.BatchSubmitRequest;
+import ru.doc.workflow.service.impl.DocumentServiceImpl;
 
 
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DocumentController {
 
-    private final DocumentService documentService;
+    private final DocumentServiceImpl documentService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

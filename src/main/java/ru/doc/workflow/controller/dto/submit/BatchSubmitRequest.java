@@ -1,4 +1,4 @@
-package ru.doc.workflow.dto.submit;
+package ru.doc.workflow.controller.dto.submit;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

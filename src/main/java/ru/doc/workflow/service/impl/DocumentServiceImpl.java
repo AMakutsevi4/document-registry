@@ -6,18 +6,16 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.doc.workflow.dto.document.DocumentRequest;
-import ru.doc.workflow.dto.document.DocumentResponse;
-import ru.doc.workflow.dto.history.DocumentWithHistoryResponse;
-import ru.doc.workflow.dto.submit.BatchResultItem;
+import ru.doc.workflow.controller.dto.document.DocumentRequest;
+import ru.doc.workflow.controller.dto.document.DocumentResponse;
+import ru.doc.workflow.controller.dto.history.DocumentWithHistoryResponse;
+import ru.doc.workflow.controller.dto.submit.BatchResultItem;
 import ru.doc.workflow.entity.Document;
 import ru.doc.workflow.enums.ActionType;
 import ru.doc.workflow.enums.BatchStatus;
 import ru.doc.workflow.enums.DocumentStatus;
 import ru.doc.workflow.mapper.DocumentMapper;
 import ru.doc.workflow.reposiory.DocumentRepository;
-import ru.doc.workflow.service.AuditService;
-import ru.doc.workflow.service.DocumentService;
 
 
 import org.springframework.data.domain.Pageable;
@@ -29,15 +27,14 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DocumentServiceImpl implements DocumentService {
+public class DocumentServiceImpl {
 
     private final DocumentRepository documentRepository;
     private final DocumentStatusServiceImpl statusService;
-    private final AuditService auditService;
+    private final AuditServiceImpl auditService;
     private final DocumentMapper mapper;
 
     @Transactional
-    @Override
     public DocumentResponse create(DocumentRequest request) {
         log.info("Creating new document: author={}, title={}", request.author(), request.title());
 
@@ -58,7 +55,6 @@ public class DocumentServiceImpl implements DocumentService {
         return mapper.toResponse(savedDoc);
     }
 
-    @Override
     @Transactional(readOnly = true)
     public DocumentWithHistoryResponse getById(Long id) {
         return documentRepository.findWithHistoryById(id)
@@ -66,15 +62,13 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElseThrow(() -> new EntityNotFoundException("Document not found with id: " + id));
     }
 
-    @Override
-    @Transactional(readOnly = true)
+      @Transactional(readOnly = true)
     public Page<DocumentResponse> getByIds(List<Long> ids, Pageable pageable) {
         log.info("Fetching documents batch: count={}", ids.size());
         return documentRepository.findAllByIdIn(ids, pageable)
                 .map(mapper::toResponse);
     }
 
-    @Override
     public List<BatchResultItem> submitBatch(List<Long> ids, String initiator, String comment) {
         log.info("Submitting documents: count={}", ids.size());
         List<BatchResultItem> results = new ArrayList<>();

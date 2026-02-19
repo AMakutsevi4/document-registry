@@ -8,18 +8,15 @@ import ru.doc.workflow.entity.Document;
 import ru.doc.workflow.enums.ActionType;
 import ru.doc.workflow.enums.DocumentStatus;
 import ru.doc.workflow.reposiory.DocumentRepository;
-import ru.doc.workflow.service.AuditService;
-import ru.doc.workflow.service.DocumentStatusService;
 
 @Service
 @RequiredArgsConstructor
-public class DocumentStatusServiceImpl implements DocumentStatusService {
+public class DocumentStatusServiceImpl {
 
     private final DocumentRepository documentRepository;
-    private final AuditService auditService;
+    private final AuditServiceImpl auditService;
 
 
-    @Override
     @Transactional
     public void submit(Long id, String initiator, String comment) {
 

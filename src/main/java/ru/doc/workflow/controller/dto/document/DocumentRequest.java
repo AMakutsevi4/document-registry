@@ -1,4 +1,4 @@
-package ru.doc.workflow.dto.document;
+package ru.doc.workflow.controller.dto.document;
 
 import jakarta.validation.constraints.NotBlank;
 

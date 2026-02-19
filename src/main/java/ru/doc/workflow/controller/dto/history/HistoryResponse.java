@@ -1,4 +1,4 @@
-package ru.doc.workflow.dto.history;
+package ru.doc.workflow.controller.dto.history;
 
 import ru.doc.workflow.enums.ActionType;
 

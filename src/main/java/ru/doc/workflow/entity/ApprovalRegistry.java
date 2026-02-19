@@ -15,6 +15,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "approval_registry")
@@ -34,4 +35,18 @@ public class ApprovalRegistry {
 
     @CreationTimestamp
     private LocalDateTime approvedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ApprovalRegistry that = (ApprovalRegistry) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
