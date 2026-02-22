@@ -38,13 +38,7 @@ public class DocumentServiceImpl {
     public DocumentResponse create(DocumentRequest request) {
         log.info("Creating new document: author={}, title={}", request.author(), request.title());
 
-        Document document = Document.builder()
-                .number(generateUniqueNumber())
-                .author(request.author())
-                .title(request.title())
-                .status(DocumentStatus.DRAFT)
-                .build();
-
+        Document document = createNew(generateUniqueNumber(), request.author(), request.title());
         Document savedDoc = documentRepository.save(document);
 
         auditService.logAction(savedDoc,
@@ -62,7 +56,7 @@ public class DocumentServiceImpl {
                 .orElseThrow(() -> new EntityNotFoundException("Document not found with id: " + id));
     }
 
-      @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Page<DocumentResponse> getByIds(List<Long> ids, Pageable pageable) {
         log.info("Fetching documents batch: count={}", ids.size());
         return documentRepository.findAllByIdIn(ids, pageable)
@@ -87,6 +81,15 @@ public class DocumentServiceImpl {
         }
 
         return results;
+    }
+
+    public static Document createNew(String number, String author, String title) {
+        Document doc = new Document();
+        doc.setNumber(number);
+        doc.setAuthor(author);
+        doc.setTitle(title);
+        doc.setStatus(DocumentStatus.DRAFT);
+        return doc;
     }
 
     private String generateUniqueNumber() {

@@ -20,7 +20,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +39,7 @@ public class Document {
     private DocumentStatus status;
 
     @OneToMany(mappedBy = "document", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DocumentHistory> history = new ArrayList<>();
+    private List<History> history = new ArrayList<>();
 
     @Version
     private Long version;

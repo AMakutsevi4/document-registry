@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.doc.workflow.entity.Document;
-import ru.doc.workflow.entity.DocumentHistory;
+import ru.doc.workflow.entity.History;
 import ru.doc.workflow.enums.ActionType;
 import ru.doc.workflow.reposiory.DocumentHistoryRepository;
 
@@ -22,7 +22,7 @@ public class AuditServiceImpl {
         log.debug("Logging history: documentId={}, action={}, initiator={}",
                 document.getId(), action, initiator);
 
-        DocumentHistory history = DocumentHistory.builder()
+        History history = History.builder()
                 .document(document)
                 .initiator(initiator)
                 .actionType(action)
