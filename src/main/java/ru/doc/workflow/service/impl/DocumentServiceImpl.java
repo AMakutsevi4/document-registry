@@ -14,6 +14,7 @@ import ru.doc.workflow.entity.Document;
 import ru.doc.workflow.enums.ActionType;
 import ru.doc.workflow.enums.BatchStatus;
 import ru.doc.workflow.enums.DocumentStatus;
+import ru.doc.workflow.exception.RegistryException;
 import ru.doc.workflow.mapper.DocumentMapper;
 import ru.doc.workflow.reposiory.DocumentRepository;
 
@@ -80,6 +81,31 @@ public class DocumentServiceImpl {
             }
         }
 
+        return results;
+    }
+
+    @Transactional
+    public List<BatchResultItem> approveBatch(List<Long> ids, String initiator, String comment) {
+        log.info("Массовое утверждение документов: количество={}, инициатор={}", ids.size(), initiator);
+        List<BatchResultItem> results = new ArrayList<>();
+        for (Long id : ids) {
+            try {
+                statusService.approve(id, initiator, comment);
+                results.add(new BatchResultItem(id, BatchStatus.SUCCESS));
+            } catch (EntityNotFoundException e) {
+                log.warn("Документ ID={} не найден", id);
+                results.add(new BatchResultItem(id, BatchStatus.NOT_FOUND));
+            } catch (IllegalStateException e) {
+                log.warn("Конфликт для документа ID={}: {}", id, e.getMessage());
+                results.add(new BatchResultItem(id, BatchStatus.CONFLICT));
+            } catch (RegistryException e) {
+                log.error("Ошибка реестра для документа ID={}: {}", id, e.getMessage());
+                results.add(new BatchResultItem(id, BatchStatus.REGISTRY_ERROR));
+            } catch (Exception e) {
+                log.error("Непредвиденная ошибка при утверждении документа ID={}: ", id, e);
+                results.add(new BatchResultItem(id, BatchStatus.CONFLICT));
+            }
+        }
         return results;
     }
 
