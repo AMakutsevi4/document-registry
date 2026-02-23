@@ -1,11 +1,14 @@
 package ru.doc.workflow.service.impl;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.doc.workflow.controller.dto.currency.ConcurrencyTestResponse;
 import ru.doc.workflow.controller.dto.document.DocumentRequest;
 import ru.doc.workflow.controller.dto.document.DocumentResponse;
 import ru.doc.workflow.controller.dto.history.DocumentWithHistoryResponse;
@@ -24,6 +27,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -62,6 +68,11 @@ public class DocumentServiceImpl {
         log.info("Fetching documents batch: count={}", ids.size());
         return documentRepository.findAllByIdIn(ids, pageable)
                 .map(mapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getIdsByStatus(DocumentStatus status, int limit) {
+        return documentRepository.findIdsByStatus(status, Limit.of(limit));
     }
 
     public List<BatchResultItem> submitBatch(List<Long> ids, String initiator, String comment) {
@@ -107,6 +118,47 @@ public class DocumentServiceImpl {
             }
         }
         return results;
+    }
+
+    public ConcurrencyTestResponse runConcurrencyTest(Long id, int threads, int attempts) {
+        log.info("Запуск теста конкурентности: ID={}, попыток={}, потоков={}", id, attempts, threads);
+
+        AtomicLong success = new AtomicLong();
+        AtomicLong conflict = new AtomicLong();
+        AtomicLong errors = new AtomicLong();
+
+        CountDownLatch startThread = new CountDownLatch(1);
+        CountDownLatch finishThread = new CountDownLatch(attempts);
+
+        try (var executor = Executors.newFixedThreadPool(threads)) {
+            for (int i = 0; i < attempts; i++) {
+                executor.submit(() -> {
+                    try {
+                        startThread.await();
+                        statusService.approve(id, "Concurrent-User", "Test");
+                        success.incrementAndGet();
+                    } catch (ObjectOptimisticLockingFailureException | IllegalStateException e) {
+                        conflict.incrementAndGet();
+                    } catch (Exception e) {
+                        log.error("Техническая ошибка: {}", e.getMessage());
+                        errors.incrementAndGet();
+                    } finally {
+                        finishThread.countDown();
+                    }
+                });
+            }
+
+            startThread.countDown();
+            finishThread.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        DocumentStatus finalStatus = documentRepository.findById(id)
+                .map(Document::getStatus)
+                .orElse(null);
+
+        return new ConcurrencyTestResponse(id, success.get(), conflict.get(), errors.get(), finalStatus);
     }
 
     public static Document createNew(String number, String author, String title) {

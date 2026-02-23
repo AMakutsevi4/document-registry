@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.doc.workflow.controller.dto.approve.BatchApproveRequest;
+import ru.doc.workflow.controller.dto.currency.ConcurrencyTestResponse;
 import ru.doc.workflow.controller.dto.document.DocumentRequest;
 import ru.doc.workflow.controller.dto.document.DocumentResponse;
 import ru.doc.workflow.controller.dto.history.DocumentWithHistoryResponse;
@@ -68,5 +69,13 @@ public class DocumentController {
                 request.initiator(),
                 request.comment()
         );
+    }
+
+    @PostMapping("/test-concurrency/{id}")
+    public ConcurrencyTestResponse testConcurrency(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "10") int threads,
+            @RequestParam(defaultValue = "10") int attempts) {
+        return documentService.runConcurrencyTest(id, threads, attempts);
     }
 }
