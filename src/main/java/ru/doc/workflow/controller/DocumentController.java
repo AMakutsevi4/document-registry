@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.doc.workflow.controller.dto.approve.BatchApproveRequest;
+import ru.doc.workflow.controller.dto.currency.ConcurrencyTestResponse;
 import ru.doc.workflow.controller.dto.document.DocumentRequest;
 import ru.doc.workflow.controller.dto.document.DocumentResponse;
 import ru.doc.workflow.controller.dto.history.DocumentWithHistoryResponse;
@@ -32,8 +34,8 @@ public class DocumentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public DocumentResponse save(@RequestBody @Valid DocumentRequest rateRequest) {
-        return documentService.create(rateRequest);
+    public DocumentResponse save(@RequestBody @Valid DocumentRequest documentRequest) {
+        return documentService.create(documentRequest);
     }
 
     @GetMapping("/{id}")
@@ -57,5 +59,23 @@ public class DocumentController {
                 request.initiator(),
                 request.comment()
         );
+    }
+
+    @PostMapping("/approve")
+    public List<BatchResultItem> approveBatch(
+            @RequestBody @Valid BatchApproveRequest request) {
+        return documentService.approveBatch(
+                request.ids(),
+                request.initiator(),
+                request.comment()
+        );
+    }
+
+    @PostMapping("/test-concurrency/{id}")
+    public ConcurrencyTestResponse testConcurrency(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "10") int threads,
+            @RequestParam(defaultValue = "10") int attempts) {
+        return documentService.runConcurrencyTest(id, threads, attempts);
     }
 }
