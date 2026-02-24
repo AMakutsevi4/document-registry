@@ -1,0 +1,226 @@
+{
+	"info": {
+		"_postman_id": "27fd2d29-cd81-484a-a999-865401a7006a",
+		"name": "documents",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Post one document",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"author\": \"Иван Иванов\",\r\n    \"title\": \"Отчет по продажам за октябрь\",\r\n    \"initiator\": \"Иван Иванов\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/documents",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get one doument",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/documents/7",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"documents",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get list documents",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/documents?ids=7,8,9&page=0&size=10&sort=createdAt,desc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"documents"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "7,8,9"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "sort",
+							"value": "createdAt,desc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post ids submit",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ids\": [12], \r\n    \"initiator\": \"Иван Оператор\",\r\n    \"comment\": \"Отправляю пачку на проверку\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/documents/submit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"documents",
+						"submit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post ids approve",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ids\": [1, 2, 3,4,5,9, 6], \r\n    \"initiator\": \"Иван Руководитель\",\r\n    \"comment\": \"Отправляю пачку на подпись\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/documents/approve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"documents",
+						"approve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-currency",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/documents/test-concurrency/20?threads=100&attempts=100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"documents",
+						"test-concurrency",
+						"20"
+					],
+					"query": [
+						{
+							"key": "threads",
+							"value": "100"
+						},
+						{
+							"key": "attempts",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "approve-kafka",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ids\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], \r\n  \"initiator\": \"Generator\",\r\n  \"action\": \"SUBMIT\",\r\n  \"comment\": \"Kafka отправка\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/documents/send-kafka",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"documents",
+						"send-kafka"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
