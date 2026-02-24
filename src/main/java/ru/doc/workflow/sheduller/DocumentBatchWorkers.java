@@ -20,7 +20,7 @@ public class DocumentBatchWorkers {
     @Value("${app.batch-size:500}")
     private int batchSize;
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 10_000)
     public void runSubmitWorker() {
         List<Long> ids = documentService.getIdsByStatus(DocumentStatus.DRAFT, batchSize);
         if (!ids.isEmpty()) {
@@ -29,7 +29,7 @@ public class DocumentBatchWorkers {
         }
     }
 
-    @Scheduled(fixedDelay = 12000)
+    @Scheduled(fixedDelay = 60_000)
     public void runApproveWorker() {
         List<Long> ids = documentService.getIdsByStatus(DocumentStatus.SUBMITTED, batchSize);
         if (!ids.isEmpty()) {

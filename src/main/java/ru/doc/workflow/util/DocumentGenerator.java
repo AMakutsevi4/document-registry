@@ -20,7 +20,6 @@ public class DocumentGenerator implements CommandLineRunner {
     private String apiUrl;
 
     public static void main(String[] args) {
-      //  SpringApplication.run(DocumentGenerator.class, args);
         SpringApplication app = new SpringApplication(DocumentGenerator.class);
         app.setWebApplicationType(WebApplicationType.NONE);
         app.run(args);
@@ -40,7 +39,6 @@ public class DocumentGenerator implements CommandLineRunner {
                         "title", "Document " + i,
                         "initiator", "Generator-Tool"
                 );
-
                 restTemplate.postForEntity(apiUrl, request, String.class);
 
                 if (i % 10 == 0) {
@@ -50,7 +48,6 @@ public class DocumentGenerator implements CommandLineRunner {
                 log.error("Ошибка на документе {}: {}", i, e.getMessage());
             }
         }
-
         log.info("Готово! Затрачено времени: {} мс", System.currentTimeMillis() - startTime);
     }
 }

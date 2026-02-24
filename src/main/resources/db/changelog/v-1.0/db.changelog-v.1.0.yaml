@@ -8,3 +8,9 @@ databaseChangeLog:
   - include:
       file: 02-2026/2026-02-18--create-approval-registry-table.sql
       relativeToChangelogFile: true
+  - include:
+      file: 02-2026/2026-02-24--add-indexes-to-documents.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 02-2026/2026-02-24--insert-table-documents.sql
+      relativeToChangelogFile: true

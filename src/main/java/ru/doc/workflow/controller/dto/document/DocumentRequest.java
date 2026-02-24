@@ -3,12 +3,12 @@ package ru.doc.workflow.controller.dto.document;
 import jakarta.validation.constraints.NotBlank;
 
 public record DocumentRequest(
-        @NotBlank(message = "Author is required")
+        @NotBlank(message = "Требуется автор")
         String author,
 
-        @NotBlank(message = "Title is required")
+        @NotBlank(message = "Требуется название")
         String title,
 
-        @NotBlank(message = "Initiator is required")
+        @NotBlank(message = "Требуется инициатор")
         String initiator
 ){}

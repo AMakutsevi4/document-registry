@@ -2,6 +2,7 @@ package ru.doc.workflow.service.impl;
 
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,7 +13,7 @@ import ru.doc.workflow.controller.dto.currency.ConcurrencyTestResponse;
 import ru.doc.workflow.controller.dto.document.DocumentRequest;
 import ru.doc.workflow.controller.dto.document.DocumentResponse;
 import ru.doc.workflow.controller.dto.history.DocumentWithHistoryResponse;
-import ru.doc.workflow.controller.dto.submit.BatchResultItem;
+import ru.doc.workflow.controller.dto.submitAndApprove.BatchResultItem;
 import ru.doc.workflow.entity.Document;
 import ru.doc.workflow.enums.ActionType;
 import ru.doc.workflow.enums.BatchStatus;
@@ -23,7 +24,9 @@ import ru.doc.workflow.reposiory.DocumentRepository;
 
 
 import org.springframework.data.domain.Pageable;
+import ru.doc.workflow.specification.DocumentSpecification;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -75,6 +78,20 @@ public class DocumentServiceImpl {
         return documentRepository.findIdsByStatus(status, Limit.of(limit));
     }
 
+    @Transactional(readOnly = true)
+    public Page<DocumentResponse> search(DocumentStatus status, String author,
+                                         LocalDateTime from, LocalDateTime to, Pageable pageable) {
+
+        Specification<Document> spec = Specification.allOf(
+                DocumentSpecification.hasStatus(status),
+                DocumentSpecification.hasAuthor(author),
+                DocumentSpecification.createdAtBetween(from, to)
+        );
+
+        return documentRepository.findAll(spec, pageable)
+                .map(mapper::toResponse);
+    }
+
     public List<BatchResultItem> submitBatch(List<Long> ids, String initiator, String comment) {
         log.info("Submitting documents: count={}", ids.size());
         List<BatchResultItem> results = new ArrayList<>();
@@ -95,7 +112,6 @@ public class DocumentServiceImpl {
         return results;
     }
 
-    @Transactional
     public List<BatchResultItem> approveBatch(List<Long> ids, String initiator, String comment) {
         log.info("Массовое утверждение документов: количество={}, инициатор={}", ids.size(), initiator);
         List<BatchResultItem> results = new ArrayList<>();
